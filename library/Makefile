@@ -27,8 +27,6 @@ OBJS=	aes.o		arc4.o		base64.o	\
 	timing.o	x509parse.o	xtea.o		\
 	camellia.o
 
-.SILENT:
-
 all: static
 
 static: libtropicssl.a
@@ -36,21 +34,21 @@ static: libtropicssl.a
 shared: libtropicssl.$(DLEXT)
 
 libtropicssl.a: $(OBJS)
-	echo "  AR    $@"
+	@echo "  AR    $@"
 	ar r $@ $(OBJS)
-	echo "  RL    $@"
+	@echo "  RL    $@"
 	ranlib $@
 
 libtropicssl.so: libtropicssl.a
-	echo "  LD    $@"
+	@echo "  LD    $@"
 	$(CC) -shared -Wl,-soname,$@ -o $@ $(OBJS)
 
 libtropicssl.dylib: libtropicssl.a
-	echo "  LD    $@"
+	@echo "  LD    $@"
 	$(CC) -dynamiclib -o $@ $(OBJS)
 
 .c.o:
-	echo "  CC    $<"
+	@echo "  CC    $<"
 	$(CC) $(CFLAGS) $(OFLAGS) -c $<
 
 clean:

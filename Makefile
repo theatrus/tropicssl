@@ -2,8 +2,6 @@
 DESTDIR=/usr/local
 PREFIX=tropicssl_
 
-.SILENT:
-
 all:
 	make -C library all
 	make -C programs all
