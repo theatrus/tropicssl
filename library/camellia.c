@@ -322,8 +322,8 @@ static const char transposes[2][20] = {
 			}														\
 	}
 
-void camellia_feistel(unsigned long x[2], unsigned long k[2],
-		      unsigned long z[2])
+static void camellia_feistel(const unsigned long x[2],
+		      const unsigned long k[2], unsigned long z[2])
 {
 	unsigned long I0, I1;
 	I0 = x[0] ^ k[0];
@@ -348,7 +348,7 @@ void camellia_feistel(unsigned long x[2], unsigned long k[2],
 /*
  * Camellia key schedule (encryption)
  */
-void camellia_setkey_enc(camellia_context * ctx, unsigned char *key,
+void camellia_setkey_enc(camellia_context * ctx, const unsigned char *key,
 			 int keysize)
 {
 	int i, idx;
@@ -456,7 +456,7 @@ void camellia_setkey_enc(camellia_context * ctx, unsigned char *key,
 /*
  * Camellia key schedule (decryption)
  */
-void camellia_setkey_dec(camellia_context * ctx, unsigned char *key,
+void camellia_setkey_dec(camellia_context * ctx, const unsigned char *key,
 			 int keysize)
 {
 	int i, idx;
@@ -509,10 +509,13 @@ void camellia_setkey_dec(camellia_context * ctx, unsigned char *key,
  */
 void camellia_crypt_ecb(camellia_context * ctx,
 			int mode,
-			unsigned char input[16], unsigned char output[16])
+			const unsigned char input[16],
+			unsigned char output[16])
 {
 	int NR;
 	unsigned long *RK, X[4];
+
+	((void)mode);
 
 	NR = ctx->nr;
 	RK = ctx->rk;
@@ -568,7 +571,8 @@ void camellia_crypt_cbc(camellia_context * ctx,
 			int mode,
 			int length,
 			unsigned char iv[16],
-			unsigned char *input, unsigned char *output)
+			const unsigned char *input,
+			unsigned char *output)
 {
 	int i;
 	unsigned char temp[16];
@@ -610,7 +614,8 @@ void camellia_crypt_cfb128(camellia_context * ctx,
 			   int length,
 			   int *iv_off,
 			   unsigned char iv[16],
-			   unsigned char *input, unsigned char *output)
+			   const unsigned char *input,
+			   unsigned char *output)
 {
 	int c, n = *iv_off;
 

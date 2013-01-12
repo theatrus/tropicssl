@@ -65,7 +65,7 @@
 /*
  * XTEA key schedule
  */
-void xtea_setup(xtea_context * ctx, unsigned char key[16])
+void xtea_setup(xtea_context * ctx, const unsigned char key[16])
 {
 	int i;
 
@@ -79,7 +79,8 @@ void xtea_setup(xtea_context * ctx, unsigned char key[16])
 /*
  * XTEA encrypt function
  */
-void xtea_crypt_ecb(xtea_context * ctx, int mode, unsigned char input[8],
+void xtea_crypt_ecb(xtea_context * ctx, int mode,
+		    const unsigned char input[8],
 		    unsigned char output[8])
 {
 	unsigned long *k, v0, v1, i;
@@ -167,19 +168,20 @@ static const unsigned char xtea_test_ct[6][8] = {
 int xtea_self_test(int verbose)
 {
 	int i;
-	unsigned char buf[8];
+	unsigned char buf_in[8];
+	unsigned char buf_out[8];
 	xtea_context ctx;
 
 	for (i = 0; i < 6; i++) {
 		if (verbose != 0)
 			printf("  XTEA test #%d: ", i + 1);
 
-		memcpy(buf, xtea_test_pt[i], 8);
+		memcpy(buf_in, xtea_test_pt[i], 8);
 
-		xtea_setup(&ctx, (unsigned char *)xtea_test_key[i]);
-		xtea_crypt_ecb(&ctx, XTEA_ENCRYPT, buf, buf);
+		xtea_setup(&ctx, xtea_test_key[i]);
+		xtea_crypt_ecb(&ctx, XTEA_ENCRYPT, buf_in, buf_out);
 
-		if (memcmp(buf, xtea_test_ct[i], 8) != 0) {
+		if (memcmp(buf_out, xtea_test_ct[i], 8) != 0) {
 			if (verbose != 0)
 				printf("failed\n");
 
