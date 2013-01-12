@@ -27,9 +27,15 @@ OBJS=	aes.o		arc4.o		base64.o	\
 	timing.o	x509parse.o	xtea.o		\
 	camellia.o
 
+.PHONY: all
+
 all: static
 
+.PHONY: static
+
 static: libtropicssl.a
+
+.PHONY: shared
 
 shared: libtropicssl.$(DLEXT)
 
@@ -50,6 +56,8 @@ libtropicssl.dylib: libtropicssl.a
 .c.o:
 	@echo "  CC    $<"
 	$(CC) $(CFLAGS) $(OFLAGS) -c $<
+
+.PHONY: clean
 
 clean:
 	rm -f *.o libtropicssl.*

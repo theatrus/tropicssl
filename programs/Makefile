@@ -16,6 +16,8 @@ APPS =	aes/aescrypt2		hash/hello		\
 	ssl/ssl_server		test/benchmark		\
 	test/selftest		test/ssl_test
 
+.PHONY: all
+
 all: $(APPS)
 
 aes/aescrypt2: aes/aescrypt2.c ../library/libtropicssl.a
@@ -89,6 +91,8 @@ test/selftest: test/selftest.c ../library/libtropicssl.a
 test/ssl_test: test/ssl_test.c ../library/libtropicssl.a
 	@echo   "  CC    test/ssl_test.c"
 	$(CC) $(CFLAGS) $(OFLAGS) test/ssl_test.c    $(LDFLAGS) -o $@
+
+.PHONY: clean
 
 clean:
 	rm -f $(APPS)

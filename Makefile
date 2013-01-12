@@ -2,9 +2,13 @@
 DESTDIR=/usr/local
 PREFIX=tropicssl_
 
+.PHONY: all
+
 all:
 	make -C library all
 	make -C programs all
+
+.PHONY: install
 
 install:
 	mkdir -p $(DESTDIR)/include/tropicssl
@@ -21,6 +25,8 @@ install:
 	        cp $$p $(DESTDIR)/bin/$$f ;     \
 	    fi                                  \
 	done
+
+.PHONY: clean
 
 clean:
 	make -C library clean
