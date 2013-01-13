@@ -49,7 +49,7 @@
 /*
  * helper to validate the mpi size and import it
  */
-static int dhm_read_bignum(mpi * X, unsigned char **p, unsigned char *end)
+static int dhm_read_bignum(mpi * X, unsigned char **p, const unsigned char *end)
 {
 	int ret, n;
 
@@ -73,7 +73,7 @@ static int dhm_read_bignum(mpi * X, unsigned char **p, unsigned char *end)
 /*
  * Parse the ServerKeyExchange parameters
  */
-int dhm_read_params(dhm_context * ctx, unsigned char **p, unsigned char *end)
+int dhm_read_params(dhm_context * ctx, unsigned char **p, const unsigned char *end)
 {
 	int ret, n;
 
@@ -157,7 +157,7 @@ cleanup:
 /*
  * Import the peer's public value G^Y
  */
-int dhm_read_public(dhm_context * ctx, unsigned char *input, int ilen)
+int dhm_read_public(dhm_context * ctx, const unsigned char *input, int ilen)
 {
 	int ret;
 
