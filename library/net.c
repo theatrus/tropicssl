@@ -88,7 +88,7 @@ static int wsa_init_done = 0;
 /*
  * Initiate a TCP connection with host:port
  */
-int net_connect(int *fd, char *host, int port)
+int net_connect(int *fd, const char *host, int port)
 {
 	struct sockaddr_in server_addr;
 	struct hostent *server_host;
@@ -130,7 +130,7 @@ int net_connect(int *fd, char *host, int port)
 /*
  * Create a listening socket on bind_ip:port
  */
-int net_bind(int *fd, char *bind_ip, int port)
+int net_bind(int *fd, const char *bind_ip, int port)
 {
 	int n, c[4];
 	struct sockaddr_in server_addr;
@@ -305,7 +305,7 @@ int net_recv(void *ctx, unsigned char *buf, int len)
 /*
  * Write at most 'len' characters
  */
-int net_send(void *ctx, unsigned char *buf, int len)
+int net_send(void *ctx, const unsigned char *buf, int len)
 {
 	int ret = write(*((int *)ctx), buf, len);
 
