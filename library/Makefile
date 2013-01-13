@@ -1,8 +1,28 @@
 
 # Also see "include/tropicssl/config.h"
 
-CFLAGS	= -I../include -D_FILE_OFFSET_BITS=64 -Wall -Werror
+# Suggested value for TROPICSSL_CFLAGS_EXTRA_WARNINGS to pass
+# on the command line, for gcc (GCC) 4.4.6 20120305
+# (Red Hat 4.4.6-4):
+#
+# make  all 'TROPICSSL_CFLAGS_EXTRA_WARNINGS= -Wextra -Wformat=2
+#   -fstrict-aliasing -Wstrict-aliasing -Wfloat-equal
+#   -Wundef -Wpointer-arith -Wbad-function-cast
+#   -Wcast-qual -Wcast-align -Wwrite-strings -Waddress
+#   -Waggregate-return -Wstrict-prototypes
+#   -Wold-style-declaration -Wold-style-definition
+#   -Wmissing-parameter-type -Wmissing-prototypes
+#   -Wmissing-declarations -Wmissing-field-initializers
+#   -Wmissing-noreturn -Wmissing-format-attribute -Wpacked
+#   -Wredundant-decls -Wnested-externs'
+#
+
+CFLAGS	= -I../include -D_FILE_OFFSET_BITS=64 -Wall $(TROPICSSL_CFLAGS_EXTRA_WARNINGS)
 OFLAGS	= -O2
+
+ifndef TROPICSSL_CFLAGS_NO_WARNINGS_AS_ERRORS
+CFLAGS += -Werror
+endif # TROPICSSL_CFLAGS_NO_WARNINGS_AS_ERRORS
 
 # MicroBlaze specific options:
 # CFLAGS += -mno-xl-soft-mul -mxl-barrel-shift
