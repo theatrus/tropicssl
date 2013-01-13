@@ -73,7 +73,7 @@ extern "C" {
 	 */
 	int padlock_xcryptecb(aes_context * ctx,
 			      int mode,
-			      unsigned char input[16],
+			      const unsigned char input[16],
 			      unsigned char output[16]);
 
 	/**
@@ -92,7 +92,8 @@ extern "C" {
 			      int mode,
 			      int length,
 			      unsigned char iv[16],
-			      unsigned char *input, unsigned char *output);
+			      const unsigned char *input,
+			      unsigned char *output);
 
 #ifdef __cplusplus
 }
