@@ -85,7 +85,7 @@ void md4_starts(md4_context * ctx)
 	ctx->state[3] = 0x10325476;
 }
 
-static void md4_process(md4_context * ctx, unsigned char data[64])
+static void md4_process(md4_context * ctx, const unsigned char data[64])
 {
 	unsigned long X[16], A, B, C, D;
 
@@ -191,7 +191,7 @@ static void md4_process(md4_context * ctx, unsigned char data[64])
 /*
  * MD4 process buffer
  */
-void md4_update(md4_context * ctx, unsigned char *input, int ilen)
+void md4_update(md4_context * ctx, const unsigned char *input, int ilen)
 {
 	int fill;
 	unsigned long left;
@@ -209,7 +209,7 @@ void md4_update(md4_context * ctx, unsigned char *input, int ilen)
 		ctx->total[1]++;
 
 	if (left && ilen >= fill) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, fill);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, fill);
 		md4_process(ctx, ctx->buffer);
 		input += fill;
 		ilen -= fill;
@@ -223,7 +223,7 @@ void md4_update(md4_context * ctx, unsigned char *input, int ilen)
 	}
 
 	if (ilen > 0) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, ilen);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, ilen);
 	}
 }
 
@@ -253,7 +253,7 @@ void md4_finish(md4_context * ctx, unsigned char output[16])
 	last = ctx->total[0] & 0x3F;
 	padn = (last < 56) ? (56 - last) : (120 - last);
 
-	md4_update(ctx, (unsigned char *)md4_padding, padn);
+	md4_update(ctx, md4_padding, padn);
 	md4_update(ctx, msglen, 8);
 
 	PUT_ULONG_LE(ctx->state[0], output, 0);
@@ -265,7 +265,7 @@ void md4_finish(md4_context * ctx, unsigned char output[16])
 /*
  * output = MD4( input buffer )
  */
-void md4(unsigned char *input, int ilen, unsigned char output[16])
+void md4(const unsigned char *input, int ilen, unsigned char output[16])
 {
 	md4_context ctx;
 
@@ -279,7 +279,7 @@ void md4(unsigned char *input, int ilen, unsigned char output[16])
 /*
  * output = MD4( file contents )
  */
-int md4_file(char *path, unsigned char output[16])
+int md4_file(const char *path, unsigned char output[16])
 {
 	FILE *f;
 	size_t n;
@@ -310,7 +310,7 @@ int md4_file(char *path, unsigned char output[16])
 /*
  * MD4 HMAC context setup
  */
-void md4_hmac_starts(md4_context * ctx, unsigned char *key, int keylen)
+void md4_hmac_starts(md4_context * ctx, const unsigned char *key, int keylen)
 {
 	int i;
 	unsigned char sum[16];
@@ -338,7 +338,7 @@ void md4_hmac_starts(md4_context * ctx, unsigned char *key, int keylen)
 /*
  * MD4 HMAC process buffer
  */
-void md4_hmac_update(md4_context * ctx, unsigned char *input, int ilen)
+void md4_hmac_update(md4_context * ctx, const unsigned char *input, int ilen)
 {
 	md4_update(ctx, input, ilen);
 }
@@ -362,7 +362,8 @@ void md4_hmac_finish(md4_context * ctx, unsigned char output[16])
 /*
  * output = HMAC-MD4( hmac key, input buffer )
  */
-void md4_hmac(unsigned char *key, int keylen, unsigned char *input, int ilen,
+void md4_hmac(const unsigned char *key, int keylen,
+	      const unsigned char *input, int ilen,
 	      unsigned char output[16])
 {
 	md4_context ctx;
@@ -427,7 +428,7 @@ int md4_self_test(int verbose)
 		if (verbose != 0)
 			printf("  MD4 test #%d: ", i + 1);
 
-		md4((unsigned char *)md4_test_str[i],
+		md4((const unsigned char *)md4_test_str[i],
 		    strlen(md4_test_str[i]), md4sum);
 
 		if (memcmp(md4sum, md4_test_sum[i], 16) != 0) {

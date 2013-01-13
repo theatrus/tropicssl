@@ -157,7 +157,7 @@ void sha4_starts(sha4_context * ctx, int is384)
 	ctx->is384 = is384;
 }
 
-static void sha4_process(sha4_context * ctx, unsigned char data[128])
+static void sha4_process(sha4_context * ctx, const unsigned char data[128])
 {
 	int i;
 	unsigned int64 temp1, temp2, W[80];
@@ -232,7 +232,7 @@ static void sha4_process(sha4_context * ctx, unsigned char data[128])
 /*
  * SHA-512 process buffer
  */
-void sha4_update(sha4_context * ctx, unsigned char *input, int ilen)
+void sha4_update(sha4_context * ctx, const unsigned char *input, int ilen)
 {
 	int fill;
 	unsigned int64 left;
@@ -249,7 +249,7 @@ void sha4_update(sha4_context * ctx, unsigned char *input, int ilen)
 		ctx->total[1]++;
 
 	if (left && ilen >= fill) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, fill);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, fill);
 		sha4_process(ctx, ctx->buffer);
 		input += fill;
 		ilen -= fill;
@@ -263,7 +263,7 @@ void sha4_update(sha4_context * ctx, unsigned char *input, int ilen)
 	}
 
 	if (ilen > 0) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, ilen);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, ilen);
 	}
 }
 
@@ -297,7 +297,7 @@ void sha4_finish(sha4_context * ctx, unsigned char output[64])
 	last = (int)(ctx->total[0] & 0x7F);
 	padn = (last < 112) ? (112 - last) : (240 - last);
 
-	sha4_update(ctx, (unsigned char *)sha4_padding, padn);
+	sha4_update(ctx, sha4_padding, padn);
 	sha4_update(ctx, msglen, 16);
 
 	PUT_UINT64_BE(ctx->state[0], output, 0);
@@ -316,7 +316,7 @@ void sha4_finish(sha4_context * ctx, unsigned char output[64])
 /*
  * output = SHA-512( input buffer )
  */
-void sha4(unsigned char *input, int ilen, unsigned char output[64], int is384)
+void sha4(const unsigned char *input, int ilen, unsigned char output[64], int is384)
 {
 	sha4_context ctx;
 
@@ -330,7 +330,7 @@ void sha4(unsigned char *input, int ilen, unsigned char output[64], int is384)
 /*
  * output = SHA-512( file contents )
  */
-int sha4_file(char *path, unsigned char output[64], int is384)
+int sha4_file(const char *path, unsigned char output[64], int is384)
 {
 	FILE *f;
 	size_t n;
@@ -361,7 +361,7 @@ int sha4_file(char *path, unsigned char output[64], int is384)
 /*
  * SHA-512 HMAC context setup
  */
-void sha4_hmac_starts(sha4_context * ctx, unsigned char *key, int keylen,
+void sha4_hmac_starts(sha4_context * ctx, const unsigned char *key, int keylen,
 		      int is384)
 {
 	int i;
@@ -390,7 +390,7 @@ void sha4_hmac_starts(sha4_context * ctx, unsigned char *key, int keylen,
 /*
  * SHA-512 HMAC process buffer
  */
-void sha4_hmac_update(sha4_context * ctx, unsigned char *input, int ilen)
+void sha4_hmac_update(sha4_context * ctx, const unsigned char *input, int ilen)
 {
 	sha4_update(ctx, input, ilen);
 }
@@ -418,8 +418,8 @@ void sha4_hmac_finish(sha4_context * ctx, unsigned char output[64])
 /*
  * output = HMAC-SHA-512( hmac key, input buffer )
  */
-void sha4_hmac(unsigned char *key, int keylen,
-	       unsigned char *input, int ilen,
+void sha4_hmac(const unsigned char *key, int keylen,
+	       const unsigned char *input, int ilen,
 	       unsigned char output[64], int is384)
 {
 	sha4_context ctx;

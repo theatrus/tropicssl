@@ -84,7 +84,7 @@ void md5_starts(md5_context * ctx)
 	ctx->state[3] = 0x10325476;
 }
 
-static void md5_process(md5_context * ctx, unsigned char data[64])
+static void md5_process(md5_context * ctx, const unsigned char data[64])
 {
 	unsigned long X[16], A, B, C, D;
 
@@ -210,7 +210,7 @@ static void md5_process(md5_context * ctx, unsigned char data[64])
 /*
  * MD5 process buffer
  */
-void md5_update(md5_context * ctx, unsigned char *input, int ilen)
+void md5_update(md5_context * ctx, const unsigned char *input, int ilen)
 {
 	int fill;
 	unsigned long left;
@@ -228,7 +228,7 @@ void md5_update(md5_context * ctx, unsigned char *input, int ilen)
 		ctx->total[1]++;
 
 	if (left && ilen >= fill) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, fill);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, fill);
 		md5_process(ctx, ctx->buffer);
 		input += fill;
 		ilen -= fill;
@@ -242,7 +242,7 @@ void md5_update(md5_context * ctx, unsigned char *input, int ilen)
 	}
 
 	if (ilen > 0) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, ilen);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, ilen);
 	}
 }
 
@@ -272,7 +272,7 @@ void md5_finish(md5_context * ctx, unsigned char output[16])
 	last = ctx->total[0] & 0x3F;
 	padn = (last < 56) ? (56 - last) : (120 - last);
 
-	md5_update(ctx, (unsigned char *)md5_padding, padn);
+	md5_update(ctx, md5_padding, padn);
 	md5_update(ctx, msglen, 8);
 
 	PUT_ULONG_LE(ctx->state[0], output, 0);
@@ -284,7 +284,7 @@ void md5_finish(md5_context * ctx, unsigned char output[16])
 /*
  * output = MD5( input buffer )
  */
-void md5(unsigned char *input, int ilen, unsigned char output[16])
+void md5(const unsigned char *input, int ilen, unsigned char output[16])
 {
 	md5_context ctx;
 
@@ -298,7 +298,7 @@ void md5(unsigned char *input, int ilen, unsigned char output[16])
 /*
  * output = MD5( file contents )
  */
-int md5_file(char *path, unsigned char output[16])
+int md5_file(const char *path, unsigned char output[16])
 {
 	FILE *f;
 	size_t n;
@@ -329,7 +329,7 @@ int md5_file(char *path, unsigned char output[16])
 /*
  * MD5 HMAC context setup
  */
-void md5_hmac_starts(md5_context * ctx, unsigned char *key, int keylen)
+void md5_hmac_starts(md5_context * ctx, const unsigned char *key, int keylen)
 {
 	int i;
 	unsigned char sum[16];
@@ -357,7 +357,7 @@ void md5_hmac_starts(md5_context * ctx, unsigned char *key, int keylen)
 /*
  * MD5 HMAC process buffer
  */
-void md5_hmac_update(md5_context * ctx, unsigned char *input, int ilen)
+void md5_hmac_update(md5_context * ctx, const unsigned char *input, int ilen)
 {
 	md5_update(ctx, input, ilen);
 }
@@ -381,7 +381,8 @@ void md5_hmac_finish(md5_context * ctx, unsigned char output[16])
 /*
  * output = HMAC-MD5( hmac key, input buffer )
  */
-void md5_hmac(unsigned char *key, int keylen, unsigned char *input, int ilen,
+void md5_hmac(const unsigned char *key, int keylen,
+	      const unsigned char *input, int ilen,
 	      unsigned char output[16])
 {
 	md5_context ctx;

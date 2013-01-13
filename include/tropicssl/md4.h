@@ -65,7 +65,7 @@ extern "C" {
 	 * \param input    buffer holding the  data
 	 * \param ilen     length of the input data
 	 */
-	void md4_update(md4_context * ctx, unsigned char *input, int ilen);
+	void md4_update(md4_context * ctx, const unsigned char *input, int ilen);
 
 	/**
 	 * \brief          MD4 final digest
@@ -82,7 +82,7 @@ extern "C" {
 	 * \param ilen     length of the input data
 	 * \param output   MD4 checksum result
 	 */
-	void md4(unsigned char *input, int ilen, unsigned char output[16]);
+	void md4(const unsigned char *input, int ilen, unsigned char output[16]);
 
 	/**
 	 * \brief          Output = MD4( file contents )
@@ -93,7 +93,7 @@ extern "C" {
 	 * \return         0 if successful, 1 if fopen failed,
 	 *                 or 2 if fread failed
 	 */
-	int md4_file(char *path, unsigned char output[16]);
+	int md4_file(const char *path, unsigned char output[16]);
 
 	/**
 	 * \brief          MD4 HMAC context setup
@@ -102,7 +102,7 @@ extern "C" {
 	 * \param key      HMAC secret key
 	 * \param keylen   length of the HMAC key
 	 */
-	void md4_hmac_starts(md4_context * ctx, unsigned char *key, int keylen);
+	void md4_hmac_starts(md4_context * ctx, const unsigned char *key, int keylen);
 
 	/**
 	 * \brief          MD4 HMAC process buffer
@@ -111,7 +111,7 @@ extern "C" {
 	 * \param input    buffer holding the  data
 	 * \param ilen     length of the input data
 	 */
-	void md4_hmac_update(md4_context * ctx, unsigned char *input, int ilen);
+	void md4_hmac_update(md4_context * ctx, const unsigned char *input, int ilen);
 
 	/**
 	 * \brief          MD4 HMAC final digest
@@ -130,8 +130,8 @@ extern "C" {
 	 * \param ilen     length of the input data
 	 * \param output   HMAC-MD4 result
 	 */
-	void md4_hmac(unsigned char *key, int keylen,
-		      unsigned char *input, int ilen, unsigned char output[16]);
+	void md4_hmac(const unsigned char *key, int keylen,
+		      const unsigned char *input, int ilen, unsigned char output[16]);
 
 	/**
 	 * \brief          Checkup routine

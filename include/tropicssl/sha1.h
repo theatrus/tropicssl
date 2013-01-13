@@ -65,7 +65,7 @@ extern "C" {
 	 * \param input    buffer holding the  data
 	 * \param ilen     length of the input data
 	 */
-	void sha1_update(sha1_context * ctx, unsigned char *input, int ilen);
+	void sha1_update(sha1_context * ctx, const unsigned char *input, int ilen);
 
 	/**
 	 * \brief          SHA-1 final digest
@@ -82,7 +82,7 @@ extern "C" {
 	 * \param ilen     length of the input data
 	 * \param output   SHA-1 checksum result
 	 */
-	void sha1(unsigned char *input, int ilen, unsigned char output[20]);
+	void sha1(const unsigned char *input, int ilen, unsigned char output[20]);
 
 	/**
 	 * \brief          Output = SHA-1( file contents )
@@ -93,7 +93,7 @@ extern "C" {
 	 * \return         0 if successful, 1 if fopen failed,
 	 *                 or 2 if fread failed
 	 */
-	int sha1_file(char *path, unsigned char output[20]);
+	int sha1_file(const char *path, unsigned char output[20]);
 
 	/**
 	 * \brief          SHA-1 HMAC context setup
@@ -102,7 +102,7 @@ extern "C" {
 	 * \param key      HMAC secret key
 	 * \param keylen   length of the HMAC key
 	 */
-	void sha1_hmac_starts(sha1_context * ctx, unsigned char *key,
+	void sha1_hmac_starts(sha1_context * ctx, const unsigned char *key,
 			      int keylen);
 
 	/**
@@ -112,7 +112,7 @@ extern "C" {
 	 * \param input    buffer holding the  data
 	 * \param ilen     length of the input data
 	 */
-	void sha1_hmac_update(sha1_context * ctx, unsigned char *input,
+	void sha1_hmac_update(sha1_context * ctx, const unsigned char *input,
 			      int ilen);
 
 	/**
@@ -132,8 +132,8 @@ extern "C" {
 	 * \param ilen     length of the input data
 	 * \param output   HMAC-SHA-1 result
 	 */
-	void sha1_hmac(unsigned char *key, int keylen,
-		       unsigned char *input, int ilen,
+	void sha1_hmac(const unsigned char *key, int keylen,
+		       const unsigned char *input, int ilen,
 		       unsigned char output[20]);
 
 	/**

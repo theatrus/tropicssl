@@ -118,7 +118,7 @@ static void md2_process(md2_context * ctx)
 /*
  * MD2 process buffer
  */
-void md2_update(md2_context * ctx, unsigned char *input, int ilen)
+void md2_update(md2_context * ctx, const unsigned char *input, int ilen)
 {
 	int fill;
 
@@ -165,7 +165,7 @@ void md2_finish(md2_context * ctx, unsigned char output[16])
 /*
  * output = MD2( input buffer )
  */
-void md2(unsigned char *input, int ilen, unsigned char output[16])
+void md2(const unsigned char *input, int ilen, unsigned char output[16])
 {
 	md2_context ctx;
 
@@ -179,7 +179,7 @@ void md2(unsigned char *input, int ilen, unsigned char output[16])
 /*
  * output = MD2( file contents )
  */
-int md2_file(char *path, unsigned char output[16])
+int md2_file(const char *path, unsigned char output[16])
 {
 	FILE *f;
 	size_t n;
@@ -210,7 +210,7 @@ int md2_file(char *path, unsigned char output[16])
 /*
  * MD2 HMAC context setup
  */
-void md2_hmac_starts(md2_context * ctx, unsigned char *key, int keylen)
+void md2_hmac_starts(md2_context * ctx, const unsigned char *key, int keylen)
 {
 	int i;
 	unsigned char sum[16];
@@ -238,7 +238,7 @@ void md2_hmac_starts(md2_context * ctx, unsigned char *key, int keylen)
 /*
  * MD2 HMAC process buffer
  */
-void md2_hmac_update(md2_context * ctx, unsigned char *input, int ilen)
+void md2_hmac_update(md2_context * ctx, const unsigned char *input, int ilen)
 {
 	md2_update(ctx, input, ilen);
 }
@@ -262,7 +262,8 @@ void md2_hmac_finish(md2_context * ctx, unsigned char output[16])
 /*
  * output = HMAC-MD2( hmac key, input buffer )
  */
-void md2_hmac(unsigned char *key, int keylen, unsigned char *input, int ilen,
+void md2_hmac(const unsigned char *key, int keylen,
+	      const unsigned char *input, int ilen,
 	      unsigned char output[16])
 {
 	md2_context ctx;
@@ -327,7 +328,7 @@ int md2_self_test(int verbose)
 		if (verbose != 0)
 			printf("  MD2 test #%d: ", i + 1);
 
-		md2((unsigned char *)md2_test_str[i],
+		md2((const unsigned char *)md2_test_str[i],
 		    strlen(md2_test_str[i]), md2sum);
 
 		if (memcmp(md2sum, md2_test_sum[i], 16) != 0) {

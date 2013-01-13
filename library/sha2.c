@@ -103,7 +103,7 @@ void sha2_starts(sha2_context * ctx, int is224)
 	ctx->is224 = is224;
 }
 
-static void sha2_process(sha2_context * ctx, unsigned char data[64])
+static void sha2_process(sha2_context * ctx, const unsigned char data[64])
 {
 	unsigned long temp1, temp2, W[64];
 	unsigned long A, B, C, D, E, F, G, H;
@@ -237,7 +237,7 @@ static void sha2_process(sha2_context * ctx, unsigned char data[64])
 /*
  * SHA-256 process buffer
  */
-void sha2_update(sha2_context * ctx, unsigned char *input, int ilen)
+void sha2_update(sha2_context * ctx, const unsigned char *input, int ilen)
 {
 	int fill;
 	unsigned long left;
@@ -255,7 +255,7 @@ void sha2_update(sha2_context * ctx, unsigned char *input, int ilen)
 		ctx->total[1]++;
 
 	if (left && ilen >= fill) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, fill);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, fill);
 		sha2_process(ctx, ctx->buffer);
 		input += fill;
 		ilen -= fill;
@@ -269,7 +269,7 @@ void sha2_update(sha2_context * ctx, unsigned char *input, int ilen)
 	}
 
 	if (ilen > 0) {
-		memcpy((void *)(ctx->buffer + left), (void *)input, ilen);
+		memcpy((void *)(ctx->buffer + left), (const void *)input, ilen);
 	}
 }
 
@@ -299,7 +299,7 @@ void sha2_finish(sha2_context * ctx, unsigned char output[32])
 	last = ctx->total[0] & 0x3F;
 	padn = (last < 56) ? (56 - last) : (120 - last);
 
-	sha2_update(ctx, (unsigned char *)sha2_padding, padn);
+	sha2_update(ctx, sha2_padding, padn);
 	sha2_update(ctx, msglen, 8);
 
 	PUT_ULONG_BE(ctx->state[0], output, 0);
@@ -317,7 +317,7 @@ void sha2_finish(sha2_context * ctx, unsigned char output[32])
 /*
  * output = SHA-256( input buffer )
  */
-void sha2(unsigned char *input, int ilen, unsigned char output[32], int is224)
+void sha2(const unsigned char *input, int ilen, unsigned char output[32], int is224)
 {
 	sha2_context ctx;
 
@@ -331,7 +331,7 @@ void sha2(unsigned char *input, int ilen, unsigned char output[32], int is224)
 /*
  * output = SHA-256( file contents )
  */
-int sha2_file(char *path, unsigned char output[32], int is224)
+int sha2_file(const char *path, unsigned char output[32], int is224)
 {
 	FILE *f;
 	size_t n;
@@ -362,7 +362,7 @@ int sha2_file(char *path, unsigned char output[32], int is224)
 /*
  * SHA-256 HMAC context setup
  */
-void sha2_hmac_starts(sha2_context * ctx, unsigned char *key, int keylen,
+void sha2_hmac_starts(sha2_context * ctx, const unsigned char *key, int keylen,
 		      int is224)
 {
 	int i;
@@ -391,7 +391,7 @@ void sha2_hmac_starts(sha2_context * ctx, unsigned char *key, int keylen,
 /*
  * SHA-256 HMAC process buffer
  */
-void sha2_hmac_update(sha2_context * ctx, unsigned char *input, int ilen)
+void sha2_hmac_update(sha2_context * ctx, const unsigned char *input, int ilen)
 {
 	sha2_update(ctx, input, ilen);
 }
@@ -419,8 +419,8 @@ void sha2_hmac_finish(sha2_context * ctx, unsigned char output[32])
 /*
  * output = HMAC-SHA-256( hmac key, input buffer )
  */
-void sha2_hmac(unsigned char *key, int keylen,
-	       unsigned char *input, int ilen,
+void sha2_hmac(const unsigned char *key, int keylen,
+	       const unsigned char *input, int ilen,
 	       unsigned char output[32], int is224)
 {
 	sha2_context ctx;
