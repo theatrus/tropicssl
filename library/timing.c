@@ -164,7 +164,7 @@ unsigned long hardclock(void)
 #endif /* AMD64   */
 #endif /* i586+   */
 
-int alarmed = 0;
+volatile int alarmed = 0;
 
 #if defined(WIN32)
 
