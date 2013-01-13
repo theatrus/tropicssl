@@ -153,7 +153,7 @@ extern "C" {
 	 *
 	 * \return         0 if successful, or an TROPICSSL_ERR_RSA_XXX error code
 	 */
-	int rsa_check_pubkey(rsa_context * ctx);
+	int rsa_check_pubkey(const rsa_context * ctx);
 
 	/**
 	 * \brief          Check a private RSA key
@@ -162,7 +162,7 @@ extern "C" {
 	 *
 	 * \return         0 if successful, or an TROPICSSL_ERR_RSA_XXX error code
 	 */
-	int rsa_check_privkey(rsa_context * ctx);
+	int rsa_check_privkey(const rsa_context * ctx);
 
 	/**
 	 * \brief          Do an RSA public key operation
@@ -180,7 +180,8 @@ extern "C" {
 	 *                 enough (eg. 128 bytes if RSA-1024 is used).
 	 */
 	int rsa_public(rsa_context * ctx,
-		       unsigned char *input, unsigned char *output);
+		       const unsigned char *input,
+		       unsigned char *output);
 
 	/**
 	 * \brief          Do an RSA private key operation
@@ -195,7 +196,8 @@ extern "C" {
 	 *                 enough (eg. 128 bytes if RSA-1024 is used).
 	 */
 	int rsa_private(rsa_context * ctx,
-			unsigned char *input, unsigned char *output);
+			const unsigned char *input,
+			unsigned char *output);
 
 	/**
 	 * \brief          Add the message padding, then do an RSA operation
@@ -213,7 +215,8 @@ extern "C" {
 	 */
 	int rsa_pkcs1_encrypt(rsa_context * ctx,
 			      int mode, int ilen,
-			      unsigned char *input, unsigned char *output);
+			      const unsigned char *input,
+			      unsigned char *output);
 
 	/**
 	 * \brief          Do an RSA operation, then remove the message padding
@@ -233,8 +236,9 @@ extern "C" {
 	 */
 	int rsa_pkcs1_decrypt(rsa_context * ctx,
 			      int mode, int *olen,
-			      unsigned char *input,
-			      unsigned char *output, int output_max_len);
+			      const unsigned char *input,
+			      unsigned char *output,
+			      int output_max_len);
 
 	/**
 	 * \brief          Do a private RSA to sign a message digest
@@ -256,7 +260,8 @@ extern "C" {
 			   int mode,
 			   int hash_id,
 			   int hashlen,
-			   unsigned char *hash, unsigned char *sig);
+			   const unsigned char *hash,
+			   unsigned char *sig);
 
 	/**
 	 * \brief          Do a public RSA and check the message digest
@@ -278,7 +283,8 @@ extern "C" {
 			     int mode,
 			     int hash_id,
 			     int hashlen,
-			     unsigned char *hash, unsigned char *sig);
+			     const unsigned char *hash,
+			     const unsigned char *sig);
 
 	/**
 	 * \brief          Free the components of an RSA key
