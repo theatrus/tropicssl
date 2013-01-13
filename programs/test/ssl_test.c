@@ -90,7 +90,7 @@ int server_fd = -1;
 struct options {
 	int opmode;		/* operation mode (client or server)    */
 	int iomode;		/* I/O mode (blocking or non-blocking)  */
-	char *server_name;	/* hostname of the server (client only) */
+	const char *server_name;	/* hostname of the server (client only) */
 	int server_port;	/* port on which the ssl service runs   */
 	int command;		/* what to do: read or write operation  */
 	int buffer_size;	/* size of the send/receive buffer      */
@@ -188,21 +188,21 @@ static int ssl_test(struct options *opt)
 	}
 
 	if (opt->opmode == OPMODE_SERVER) {
-		ret = x509parse_crt(&srvcert, (unsigned char *)test_srv_crt,
+		ret = x509parse_crt(&srvcert, (const unsigned char *)test_srv_crt,
 				    strlen(test_srv_crt));
 		if (ret != 0) {
 			printf("  !  x509parse_crt returned %d\n\n", ret);
 			goto exit;
 		}
 
-		ret = x509parse_crt(&srvcert, (unsigned char *)test_ca_crt,
+		ret = x509parse_crt(&srvcert, (const unsigned char *)test_ca_crt,
 				    strlen(test_ca_crt));
 		if (ret != 0) {
 			printf("  !  x509parse_crt returned %d\n\n", ret);
 			goto exit;
 		}
 
-		ret = x509parse_key(&rsa, (unsigned char *)test_srv_key,
+		ret = x509parse_key(&rsa, (const unsigned char *)test_srv_key,
 				    strlen(test_srv_key), NULL, 0);
 		if (ret != 0) {
 			printf("  !  x509parse_key returned %d\n\n", ret);

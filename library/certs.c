@@ -37,7 +37,7 @@
 
 #if defined(TROPICSSL_CERTS_C)
 
-char test_ca_crt[] =
+const char test_ca_crt[] =
     "-----BEGIN CERTIFICATE-----\r\n"
     "MIIDpTCCAo2gAwIBAgIBADANBgkqhkiG9w0BAQUFADBFMQswCQYDVQQGEwJGUjEO\r\n"
     "MAwGA1UEBxMFUGFyaXMxDjAMBgNVBAoTBVh5U1NMMRYwFAYDVQQDEw1YeVNTTCBU\r\n"
@@ -60,7 +60,7 @@ char test_ca_crt[] =
     "S2oRWWr4LUvXT7z9BBAvw2eJQD+a4uAya6EURG7AsAvr5MnWn/r0wLWmBJ6fB1Yp\r\n"
     "F1kOmamOFvstLMf74rLX+LGKeJ/nwuI5FQ==\r\n" "-----END CERTIFICATE-----\r\n";
 
-char test_ca_key[] =
+const char test_ca_key[] =
     "-----BEGIN RSA PRIVATE KEY-----\r\n"
     "Proc-Type: 4,ENCRYPTED\r\n"
     "DEK-Info: DES-EDE3-CBC,7BDC280BA4C2F45C\r\n"
@@ -92,9 +92,9 @@ char test_ca_key[] =
     "5bLyT8G6kfCSY4uHxs9lPuvfOjk9ptjy2FwfyBb3Sl4K+IFEE8XTNuNErh83AKh2\r\n"
     "-----END RSA PRIVATE KEY-----\r\n";
 
-char test_ca_pwd[] = "test";
+const char test_ca_pwd[] = "test";
 
-char test_srv_crt[] =
+const char test_srv_crt[] =
     "-----BEGIN CERTIFICATE-----\r\n"
     "MIIDPjCCAiagAwIBAgIBAjANBgkqhkiG9w0BAQUFADBFMQswCQYDVQQGEwJGUjEO\r\n"
     "MAwGA1UEBxMFUGFyaXMxDjAMBgNVBAoTBVh5U1NMMRYwFAYDVQQDEw1YeVNTTCBU\r\n"
@@ -115,7 +115,7 @@ char test_srv_crt[] =
     "FrHsTi6urSfZuGlZNxDXDHEE7Q2snAvvev+KR7DD9X4DJGcPX9gA4CGJj+9ZzyAA\r\n"
     "ZTGpOzk1hIH44RFs2lJMZRlE\r\n" "-----END CERTIFICATE-----\r\n";
 
-char test_srv_key[] =
+const char test_srv_key[] =
     "-----BEGIN RSA PRIVATE KEY-----\r\n"
     "MIIEowIBAAKCAQEAuNDw3Bk4Jh5Lep6Fw35I1bspo4jWAYI7Yi+7gNSnt7V0rWnB\r\n"
     "HnEHpPzicWKmK+333FmpUtvSy+h2yqYtMS2SgWw/QApA4dWf0rx5ckDyCyXWG/Qz\r\n"
@@ -144,7 +144,7 @@ char test_srv_key[] =
     "qkdECl0+G2Fo/ER4NRCv7a24WNEsOMGzGRqw5cnSJrjbZLYMaIyK\r\n"
     "-----END RSA PRIVATE KEY-----\r\n";
 
-char test_cli_crt[] =
+const char test_cli_crt[] =
     "-----BEGIN CERTIFICATE-----\r\n"
     "MIIDPTCCAiWgAwIBAgIBATANBgkqhkiG9w0BAQUFADBFMQswCQYDVQQGEwJGUjEO\r\n"
     "MAwGA1UEBxMFUGFyaXMxDjAMBgNVBAoTBVh5U1NMMRYwFAYDVQQDEw1YeVNTTCBU\r\n"
@@ -165,7 +165,7 @@ char test_cli_crt[] =
     "sUbe+HFPMWwU5lBv/oOhQkz0VD+HusYtXWS2lG88cT40aNly2CkYUugdTR/b9Uea\r\n"
     "p/i862sL/lO40qlQ0xV5N7U=\r\n" "-----END CERTIFICATE-----\r\n";
 
-char test_cli_key[] =
+const char test_cli_key[] =
     "-----BEGIN RSA PRIVATE KEY-----\r\n"
     "MIIEowIBAAKCAQEApmSDwA2XqQaYsaopzopQdv0ixnBvb4qMHDzdBvQq689We7cz\r\n"
     "MRxcW85nzeDQ8v/Pyhvk8qvwc/ptVjOGwPrmKZwIMQRU+Tb2vRcZOCAaMHrTUV3x\r\n"
@@ -194,7 +194,7 @@ char test_cli_key[] =
     "4Bi2YRTiHhpEuBqKlhHLDFHneo3SMYh8PU/PDQQcyWGHHUi9z1RE\r\n"
     "-----END RSA PRIVATE KEY-----\r\n";
 
-char xyssl_ca_crt[] =
+const char xyssl_ca_crt[] =
     "-----BEGIN CERTIFICATE-----\r\n"
     "MIIEADCCAuigAwIBAgIBADANBgkqhkiG9w0BAQUFADBjMQswCQYDVQQGEwJVUzEh\r\n"
     "MB8GA1UEChMYVGhlIEdvIERhZGR5IEdyb3VwLCBJbmMuMTEwLwYDVQQLEyhHbyBE\r\n"

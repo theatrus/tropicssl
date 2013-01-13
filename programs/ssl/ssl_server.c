@@ -196,21 +196,21 @@ int main(void)
 	 * Instead, you may want to use x509parse_crtfile() to read the
 	 * server and CA certificates, as well as x509parse_keyfile().
 	 */
-	ret = x509parse_crt(&srvcert, (unsigned char *)test_srv_crt,
+	ret = x509parse_crt(&srvcert, (const unsigned char *)test_srv_crt,
 			    strlen(test_srv_crt));
 	if (ret != 0) {
 		printf(" failed\n  !  x509parse_crt returned %d\n\n", ret);
 		goto exit;
 	}
 
-	ret = x509parse_crt(&srvcert, (unsigned char *)test_ca_crt,
+	ret = x509parse_crt(&srvcert, (const unsigned char *)test_ca_crt,
 			    strlen(test_ca_crt));
 	if (ret != 0) {
 		printf(" failed\n  !  x509parse_crt returned %d\n\n", ret);
 		goto exit;
 	}
 
-	ret = x509parse_key(&rsa, (unsigned char *)test_srv_key,
+	ret = x509parse_key(&rsa, (const unsigned char *)test_srv_key,
 			    strlen(test_srv_key), NULL, 0);
 	if (ret != 0) {
 		printf(" failed\n  !  x509parse_key returned %d\n\n", ret);

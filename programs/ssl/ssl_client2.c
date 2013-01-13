@@ -95,7 +95,7 @@ int main(void)
 	 * Alternatively, you may load the CA certificates from a .pem or
 	 * .crt file by calling x509parse_crtfile( &cacert, "myca.crt" ).
 	 */
-	ret = x509parse_crt(&cacert, (unsigned char *)xyssl_ca_crt,
+	ret = x509parse_crt(&cacert, (const unsigned char *)xyssl_ca_crt,
 			    strlen(xyssl_ca_crt));
 	if (ret != 0) {
 		printf(" failed\n  !  x509parse_crt returned %d\n\n", ret);
@@ -114,14 +114,14 @@ int main(void)
 
 	memset(&clicert, 0, sizeof(x509_cert));
 
-	ret = x509parse_crt(&clicert, (unsigned char *)test_cli_crt,
+	ret = x509parse_crt(&clicert, (const unsigned char *)test_cli_crt,
 			    strlen(test_cli_crt));
 	if (ret != 0) {
 		printf(" failed\n  !  x509parse_crt returned %d\n\n", ret);
 		goto exit;
 	}
 
-	ret = x509parse_key(&rsa, (unsigned char *)test_cli_key,
+	ret = x509parse_key(&rsa, (const unsigned char *)test_cli_key,
 			    strlen(test_cli_key), NULL, 0);
 	if (ret != 0) {
 		printf(" failed\n  !  x509parse_key returned %d\n\n", ret);
