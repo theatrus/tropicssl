@@ -31,7 +31,9 @@ endif # TROPICSSL_CFLAGS_NO_WARNINGS_AS_ERRORS
 # CFLAGS += -D_BSD_EXTENSION
 
 # To compile as a shared library:
-# CFLAGS += -fPIC
+ifdef TROPICSSL_SHARED
+CFLAGS += -fPIC
+endif # TROPICSSL_SHARED
 
 DLEXT=so
 # OSX shared library extension:
@@ -49,7 +51,11 @@ OBJS=	aes.o		arc4.o		base64.o	\
 
 .PHONY: all
 
+ifdef TROPICSSL_SHARED
+all: shared
+else # TROPICSSL_SHARED
 all: static
+endif # TROPICSSL_SHARED
 
 .PHONY: static
 
