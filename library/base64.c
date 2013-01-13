@@ -68,7 +68,7 @@ static const unsigned char base64_dec_map[128] = {
 /*
  * Encode a buffer into base64 format
  */
-int base64_encode(unsigned char *dst, int *dlen, unsigned char *src, int slen)
+int base64_encode(unsigned char *dst, int *dlen, const unsigned char *src, int slen)
 {
 	int i, n;
 	int C1, C2, C3;
@@ -132,7 +132,7 @@ int base64_encode(unsigned char *dst, int *dlen, unsigned char *src, int slen)
 /*
  * Decode a base64-formatted buffer
  */
-int base64_decode(unsigned char *dst, int *dlen, unsigned char *src, int slen)
+int base64_decode(unsigned char *dst, int *dlen, const unsigned char *src, int slen)
 {
 	int i, j, n;
 	unsigned long x;
@@ -216,13 +216,14 @@ static const unsigned char base64_test_enc[] =
 int base64_self_test(int verbose)
 {
 	int len;
-	unsigned char *src, buffer[128];
+	unsigned char buffer[128];
+	const unsigned char *src;
 
 	if (verbose != 0)
 		printf("  Base64 encoding test: ");
 
 	len = sizeof(buffer);
-	src = (unsigned char *)base64_test_dec;
+	src = base64_test_dec;
 
 	if (base64_encode(buffer, &len, src, 64) != 0 ||
 	    memcmp(base64_test_enc, buffer, 88) != 0) {
@@ -236,7 +237,7 @@ int base64_self_test(int verbose)
 		printf("passed\n  Base64 decoding test: ");
 
 	len = sizeof(buffer);
-	src = (unsigned char *)base64_test_enc;
+	src = base64_test_enc;
 
 	if (base64_decode(buffer, &len, src, 88) != 0 ||
 	    memcmp(base64_test_dec, buffer, 64) != 0) {
