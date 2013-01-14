@@ -107,7 +107,7 @@ struct options {
  * Although this PRNG has good statistical properties (eg. passes
  * DIEHARD), it is not cryptographically secure.
  */
-unsigned long int lcppm5(unsigned long int *state)
+static unsigned long int lcppm5(unsigned long int *state)
 {
 	unsigned long int u, v;
 
@@ -142,8 +142,8 @@ static int ssl_test(struct options *opt)
 	int client_fd;
 	int bytes_to_read;
 	int bytes_to_write;
-	int offset_to_read;
-	int offset_to_write;
+	int offset_to_read = 0;
+	int offset_to_write = 0;
 
 	long int nb_read;
 	long int nb_written;
@@ -151,8 +151,8 @@ static int ssl_test(struct options *opt)
 	unsigned long read_state[5];
 	unsigned long write_state[5];
 
-	unsigned char *read_buf;
-	unsigned char *write_buf;
+	unsigned char *read_buf = NULL;
+	unsigned char *write_buf = NULL;
 
 	struct hr_time t;
 	havege_state hs;
