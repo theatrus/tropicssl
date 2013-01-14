@@ -195,7 +195,8 @@ void debug_print_crt(const ssl_context * ssl, int level,
 	maxlen = sizeof(str) - 1;
 
 	while (crt != NULL && crt->next != NULL) {
-		p = x509parse_cert_info(prefix, crt);
+		char buf[1024];
+		p = x509parse_cert_info(buf, sizeof(buf)-1, prefix, crt);
 
 		snprintf(str, maxlen, "%s(%04d): %s #%d:\n%s",
 			 file, line, text, ++i, p);
