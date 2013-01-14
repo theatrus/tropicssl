@@ -53,6 +53,7 @@
 #include "tropicssl/aes.h"
 #include "tropicssl/base64.h"
 #include "tropicssl/bignum.h"
+#include "tropicssl/camellia.h"
 #include "tropicssl/rsa.h"
 #include "tropicssl/x509.h"
 #include "tropicssl/xtea.h"
