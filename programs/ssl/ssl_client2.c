@@ -58,7 +58,7 @@
 
 #define DEBUG_LEVEL 0
 
-void my_debug(void *ctx, int level, char *str)
+static void my_debug(void *ctx, int level, const char *str)
 {
 	if (level < DEBUG_LEVEL) {
 		fprintf((FILE *) ctx, "%s", str);
@@ -162,6 +162,7 @@ int main(void)
 	ssl_set_authmode(&ssl, SSL_VERIFY_OPTIONAL);
 
 	ssl_set_rng(&ssl, havege_rand, &hs);
+	ssl_set_dbg(&ssl, my_debug, stdout);
 	ssl_set_bio(&ssl, net_recv, &server_fd, net_send, &server_fd);
 
 	ssl_set_ciphers(&ssl, ssl_default_ciphers);

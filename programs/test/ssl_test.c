@@ -75,8 +75,8 @@
 /*
  * server-specific data
  */
-char *dhm_G = "4";
-char *dhm_P =
+static const char *dhm_G = "4";
+static const char *dhm_P =
     "E4004C1F94182000103D883A448B3F802CE4B44A83301270002C20D0321CFD00"
     "11CCEF784C26A400F43DFB901BCA7538F2C6B176001CF5A0FD16D2C48B1D0C1C"
     "F6AC8E1DA6BCC3B4E1F96B0564965300FFA1D0B601EB2800F489AA512C4B248C"
@@ -127,7 +127,7 @@ unsigned long int lcppm5(unsigned long int *state)
 	return (u);
 }
 
-void my_debug(void *ctx, int level, char *str)
+static void my_debug(void *ctx, int level, const char *str)
 {
 	if (level < ((struct options *)ctx)->debug_level)
 		fprintf(stderr, "%s", str);

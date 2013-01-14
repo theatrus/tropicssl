@@ -59,7 +59,7 @@
 /*
  * Key material generation
  */
-static int tls1_prf(unsigned char *secret, int slen, char *label,
+static int tls1_prf(unsigned char *secret, int slen, const char *label,
 		    unsigned char *random, int rlen,
 		    unsigned char *dstbuf, int dlen)
 {
@@ -1351,7 +1351,7 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 			      md5_context * md5, sha1_context * sha1)
 {
 	int len = 12;
-	char *sender;
+	const char *sender;
 	unsigned char padbuf[48];
 	unsigned char md5sum[16];
 	unsigned char sha1sum[20];
@@ -1378,17 +1378,17 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 		      sha1->state, sizeof(sha1->state));
 
 	if (ssl->minor_ver == SSL_MINOR_VERSION_0) {
-		sender = (from == SSL_IS_CLIENT) ? (char *)"CLNT"
-		    : (char *)"SRVR";
+		sender = (from == SSL_IS_CLIENT) ? "CLNT"
+		    : "SRVR";
 
 		memset(padbuf, 0x36, 48);
 
-		md5_update(md5, (unsigned char *)sender, 4);
+		md5_update(md5, (const unsigned char *)sender, 4);
 		md5_update(md5, ssl->session->master, 48);
 		md5_update(md5, padbuf, 48);
 		md5_finish(md5, md5sum);
 
-		sha1_update(sha1, (unsigned char *)sender, 4);
+		sha1_update(sha1, (const unsigned char *)sender, 4);
 		sha1_update(sha1, ssl->session->master, 48);
 		sha1_update(sha1, padbuf, 40);
 		sha1_finish(sha1, sha1sum);
@@ -1410,7 +1410,7 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 		len += 24;
 	} else {
 		sender = (from == SSL_IS_CLIENT)
-		    ? (char *)"client finished" : (char *)"server finished";
+		    ? "client finished" : "server finished";
 
 		md5_finish(md5, padbuf);
 		sha1_finish(sha1, padbuf + 16);
@@ -1586,7 +1586,7 @@ void ssl_set_rng(ssl_context * ssl, int (*f_rng) (void *), void *p_rng)
 }
 
 void ssl_set_dbg(ssl_context * ssl,
-		 void (*f_dbg) (void *, int, char *), void *p_dbg)
+		 void (*f_dbg) (void *, int, const char *), void *p_dbg)
 {
 	ssl->f_dbg = f_dbg;
 	ssl->p_dbg = p_dbg;
@@ -1594,7 +1594,7 @@ void ssl_set_dbg(ssl_context * ssl,
 
 void ssl_set_bio(ssl_context * ssl,
 		 int (*f_recv) (void *, unsigned char *, int), void *p_recv,
-		 int (*f_send) (void *, unsigned char *, int), void *p_send)
+		 int (*f_send) (void *, const unsigned char *, int), void *p_send)
 {
 	ssl->f_recv = f_recv;
 	ssl->f_send = f_send;
@@ -1617,12 +1617,12 @@ void ssl_set_session(ssl_context * ssl, int resume, int timeout,
 	ssl->session = session;
 }
 
-void ssl_set_ciphers(ssl_context * ssl, int *ciphers)
+void ssl_set_ciphers(ssl_context * ssl, const int *ciphers)
 {
 	ssl->ciphers = ciphers;
 }
 
-void ssl_set_ca_chain(ssl_context * ssl, x509_cert * ca_chain, char *peer_cn)
+void ssl_set_ca_chain(ssl_context * ssl, x509_cert * ca_chain, const char *peer_cn)
 {
 	ssl->ca_chain = ca_chain;
 	ssl->peer_cn = peer_cn;
@@ -1635,7 +1635,7 @@ void ssl_set_own_cert(ssl_context * ssl, x509_cert * own_cert,
 	ssl->rsa_key = rsa_key;
 }
 
-int ssl_set_dh_param(ssl_context * ssl, char *dhm_P, char *dhm_G)
+int ssl_set_dh_param(ssl_context * ssl, const char *dhm_P, const char *dhm_G)
 {
 	int ret;
 
@@ -1652,7 +1652,7 @@ int ssl_set_dh_param(ssl_context * ssl, char *dhm_P, char *dhm_G)
 	return (0);
 }
 
-int ssl_set_hostname(ssl_context * ssl, char *hostname)
+int ssl_set_hostname(ssl_context * ssl, const char *hostname)
 {
 	if (hostname == NULL)
 		return (TROPICSSL_ERR_SSL_BAD_INPUT_DATA);
@@ -1660,7 +1660,7 @@ int ssl_set_hostname(ssl_context * ssl, char *hostname)
 	ssl->hostname_len = strlen(hostname);
 	ssl->hostname = (unsigned char *)malloc(ssl->hostname_len + 1);
 
-	memcpy(ssl->hostname, (unsigned char *)hostname, ssl->hostname_len);
+	memcpy(ssl->hostname, hostname, ssl->hostname_len);
 
 	return (0);
 }
@@ -1668,17 +1668,17 @@ int ssl_set_hostname(ssl_context * ssl, char *hostname)
 /*
  * SSL get accessors
  */
-int ssl_get_bytes_avail(ssl_context * ssl)
+int ssl_get_bytes_avail(const ssl_context * ssl)
 {
 	return (ssl->in_offt == NULL ? 0 : ssl->in_msglen);
 }
 
-int ssl_get_verify_result(ssl_context * ssl)
+int ssl_get_verify_result(const ssl_context * ssl)
 {
 	return (ssl->verify_result);
 }
 
-char *ssl_get_cipher(ssl_context * ssl)
+const char *ssl_get_cipher(const ssl_context * ssl)
 {
 	switch (ssl->session->cipher) {
 #if defined(TROPICSSL_ARC4_C)
@@ -1726,7 +1726,7 @@ char *ssl_get_cipher(ssl_context * ssl)
 	return ("unknown");
 }
 
-int ssl_default_ciphers[] = {
+const int ssl_default_ciphers[] = {
 #if defined(TROPICSSL_DHM_C)
 #if defined(TROPICSSL_AES_C)
 	SSL_EDH_RSA_AES_256_SHA,
@@ -1843,7 +1843,7 @@ int ssl_read(ssl_context * ssl, unsigned char *buf, int len)
 /*
  * Send application data to be encrypted by the SSL layer
  */
-int ssl_write(ssl_context * ssl, unsigned char *buf, int len)
+int ssl_write(ssl_context * ssl, const unsigned char *buf, int len)
 {
 	int ret, n;
 

@@ -56,7 +56,7 @@
 
 #define DEBUG_LEVEL 0
 
-void my_debug(void *ctx, int level, char *str)
+static void my_debug(void *ctx, int level, const char *str)
 {
 	if (level < DEBUG_LEVEL) {
 		fprintf((FILE *) ctx, "%s", str);
