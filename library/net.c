@@ -96,6 +96,7 @@ int net_connect(int *fd, const char *host, int port)
 #if defined(WIN32) || defined(_WIN32_WCE)
 	WSADATA wsaData;
 
+	*fd = -1;
 	if (wsa_init_done == 0) {
 		if (WSAStartup(MAKEWORD(2, 0), &wsaData) == SOCKET_ERROR)
 			return (TROPICSSL_ERR_NET_SOCKET_FAILED);
@@ -103,6 +104,7 @@ int net_connect(int *fd, const char *host, int port)
 		wsa_init_done = 1;
 	}
 #else
+	*fd = -1;
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -121,6 +123,7 @@ int net_connect(int *fd, const char *host, int port)
 	if (connect(*fd, (struct sockaddr *)&server_addr,
 		    sizeof(server_addr)) < 0) {
 		close(*fd);
+		*fd = -1;
 		return (TROPICSSL_ERR_NET_CONNECT_FAILED);
 	}
 
@@ -138,6 +141,7 @@ int net_bind(int *fd, const char *bind_ip, int port)
 #if defined(WIN32) || defined(_WIN32_WCE)
 	WSADATA wsaData;
 
+	*fd = -1;
 	if (wsa_init_done == 0) {
 		if (WSAStartup(MAKEWORD(2, 0), &wsaData) == SOCKET_ERROR)
 			return (TROPICSSL_ERR_NET_SOCKET_FAILED);
@@ -145,6 +149,7 @@ int net_bind(int *fd, const char *bind_ip, int port)
 		wsa_init_done = 1;
 	}
 #else
+	*fd = -1;
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -175,11 +180,13 @@ int net_bind(int *fd, const char *bind_ip, int port)
 
 	if (bind(*fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
 		close(*fd);
+		*fd = -1;
 		return (TROPICSSL_ERR_NET_BIND_FAILED);
 	}
 
 	if (listen(*fd, 10) != 0) {
 		close(*fd);
+		*fd = -1;
 		return (TROPICSSL_ERR_NET_LISTEN_FAILED);
 	}
 
@@ -335,8 +342,10 @@ int net_send(void *ctx, const unsigned char *buf, int len)
  */
 void net_close(int fd)
 {
-	shutdown(fd, 2);
-	close(fd);
+	if (fd >= 0) {
+		shutdown(fd, 2);
+		close(fd);
+	}
 }
 
 #endif
