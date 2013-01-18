@@ -173,8 +173,8 @@ static int my_set_session(ssl_context * ssl)
 int main(void)
 {
 	int ret, len;
-	int listen_fd;
-	int client_fd;
+	int listen_fd = -1;
+	int client_fd = -1;
 	unsigned char buf[1024];
 
 	havege_state hs;
@@ -189,7 +189,10 @@ int main(void)
 	printf("\n  . Loading the server cert. and key...");
 	fflush(stdout);
 
+	memset(&ssl, 0, sizeof(ssl_context));
+	memset(&ssn, 0, sizeof(ssl_session));
 	memset(&srvcert, 0, sizeof(x509_cert));
+	memset(&rsa, 0, sizeof(rsa_context));
 
 	/*
 	 * This demonstration program uses embedded test certificates.
@@ -283,8 +286,6 @@ accept:
 
 	ssl_set_ciphers(&ssl, my_ciphers);
 	ssl_set_session(&ssl, 1, 0, &ssn);
-
-	memset(&ssn, 0, sizeof(ssl_session));
 
 	ssl_set_ca_chain(&ssl, srvcert.next, NULL);
 	ssl_set_own_cert(&ssl, &srvcert, &rsa);
