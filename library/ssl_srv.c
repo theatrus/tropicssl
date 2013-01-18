@@ -495,8 +495,8 @@ static int ssl_write_server_key_exchange(ssl_context * ssl)
 {
 	int ret, n;
 	unsigned char hash[36];
-	md5_context md5;
-	sha1_context sha1;
+	md5_context md5_ctx;
+	sha1_context sha1_ctx;
 
 	SSL_DEBUG_MSG(2, ("=> write server key exchange"));
 
@@ -544,15 +544,15 @@ static int ssl_write_server_key_exchange(ssl_context * ssl)
 	 *     SHA(ClientHello.random + ServerHello.random
 	 *                            + ServerParams);
 	 */
-	md5_starts(&md5);
-	md5_update(&md5, ssl->randbytes, 64);
-	md5_update(&md5, ssl->out_msg + 4, n);
-	md5_finish(&md5, hash);
+	md5_starts(&md5_ctx);
+	md5_update(&md5_ctx, ssl->randbytes, 64);
+	md5_update(&md5_ctx, ssl->out_msg + 4, n);
+	md5_finish(&md5_ctx, hash);
 
-	sha1_starts(&sha1);
-	sha1_update(&sha1, ssl->randbytes, 64);
-	sha1_update(&sha1, ssl->out_msg + 4, n);
-	sha1_finish(&sha1, hash + 16);
+	sha1_starts(&sha1_ctx);
+	sha1_update(&sha1_ctx, ssl->randbytes, 64);
+	sha1_update(&sha1_ctx, ssl->out_msg + 4, n);
+	sha1_finish(&sha1_ctx, hash + 16);
 
 	SSL_DEBUG_BUF(3, "parameters hash", hash, 36);
 

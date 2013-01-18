@@ -60,7 +60,7 @@
  * Key material generation
  */
 static int tls1_prf(unsigned char *secret, int slen, const char *label,
-		    unsigned char *random, int rlen,
+		    unsigned char *randombytes, int rlen,
 		    unsigned char *dstbuf, int dlen)
 {
 	int nb, hs;
@@ -78,11 +78,11 @@ static int tls1_prf(unsigned char *secret, int slen, const char *label,
 
 	nb = strlen(label);
 	memcpy(tmp + 20, label, nb);
-	memcpy(tmp + 20 + nb, random, rlen);
+	memcpy(tmp + 20 + nb, randombytes, rlen);
 	nb += rlen;
 
 	/*
-	 * First compute P_md5(secret,label+random)[0..dlen]
+	 * First compute P_md5(secret,label+randombytes)[0..dlen]
 	 */
 	md5_hmac(S1, hs, tmp + 20, nb, 4 + tmp);
 
@@ -97,7 +97,7 @@ static int tls1_prf(unsigned char *secret, int slen, const char *label,
 	}
 
 	/*
-	 * XOR out with P_sha1(secret,label+random)[0..dlen]
+	 * XOR out with P_sha1(secret,label+randombytes)[0..dlen]
 	 */
 	sha1_hmac(S2, hs, tmp + 20, nb, tmp);
 
@@ -120,8 +120,8 @@ static int tls1_prf(unsigned char *secret, int slen, const char *label,
 int ssl_derive_keys(ssl_context * ssl)
 {
 	int i;
-	md5_context md5;
-	sha1_context sha1;
+	md5_context md5_ctx;
+	sha1_context sha1_ctx;
 	unsigned char tmp[64];
 	unsigned char padding[16];
 	unsigned char sha1sum[20];
@@ -150,16 +150,16 @@ int ssl_derive_keys(ssl_context * ssl)
 			for (i = 0; i < 3; i++) {
 				memset(padding, 'A' + i, 1 + i);
 
-				sha1_starts(&sha1);
-				sha1_update(&sha1, padding, 1 + i);
-				sha1_update(&sha1, ssl->premaster, len);
-				sha1_update(&sha1, ssl->randbytes, 64);
-				sha1_finish(&sha1, sha1sum);
+				sha1_starts(&sha1_ctx);
+				sha1_update(&sha1_ctx, padding, 1 + i);
+				sha1_update(&sha1_ctx, ssl->premaster, len);
+				sha1_update(&sha1_ctx, ssl->randbytes, 64);
+				sha1_finish(&sha1_ctx, sha1sum);
 
-				md5_starts(&md5);
-				md5_update(&md5, ssl->premaster, len);
-				md5_update(&md5, sha1sum, 20);
-				md5_finish(&md5, ssl->session->master + i * 16);
+				md5_starts(&md5_ctx);
+				md5_update(&md5_ctx, ssl->premaster, len);
+				md5_update(&md5_ctx, sha1sum, 20);
+				md5_finish(&md5_ctx, ssl->session->master + i * 16);
 			}
 		} else
 			tls1_prf(ssl->premaster, len, "master secret",
@@ -193,20 +193,20 @@ int ssl_derive_keys(ssl_context * ssl)
 		for (i = 0; i < 16; i++) {
 			memset(padding, 'A' + i, 1 + i);
 
-			sha1_starts(&sha1);
-			sha1_update(&sha1, padding, 1 + i);
-			sha1_update(&sha1, ssl->session->master, 48);
-			sha1_update(&sha1, ssl->randbytes, 64);
-			sha1_finish(&sha1, sha1sum);
+			sha1_starts(&sha1_ctx);
+			sha1_update(&sha1_ctx, padding, 1 + i);
+			sha1_update(&sha1_ctx, ssl->session->master, 48);
+			sha1_update(&sha1_ctx, ssl->randbytes, 64);
+			sha1_finish(&sha1_ctx, sha1sum);
 
-			md5_starts(&md5);
-			md5_update(&md5, ssl->session->master, 48);
-			md5_update(&md5, sha1sum, 20);
-			md5_finish(&md5, keyblk + i * 16);
+			md5_starts(&md5_ctx);
+			md5_update(&md5_ctx, ssl->session->master, 48);
+			md5_update(&md5_ctx, sha1sum, 20);
+			md5_finish(&md5_ctx, keyblk + i * 16);
 		}
 
-		memset(&md5, 0, sizeof(md5));
-		memset(&sha1, 0, sizeof(sha1));
+		memset(&md5_ctx, 0, sizeof(md5_ctx));
+		memset(&sha1_ctx, 0, sizeof(sha1_ctx));
 
 		memset(padding, 0, sizeof(padding));
 		memset(sha1sum, 0, sizeof(sha1sum));
@@ -379,42 +379,42 @@ int ssl_derive_keys(ssl_context * ssl)
 
 void ssl_calc_verify(ssl_context * ssl, unsigned char hash[36])
 {
-	md5_context md5;
-	sha1_context sha1;
+	md5_context md5_ctx;
+	sha1_context sha1_ctx;
 	unsigned char pad_1[48];
 	unsigned char pad_2[48];
 
 	SSL_DEBUG_MSG(2, ("=> calc verify"));
 
-	memcpy(&md5, &ssl->fin_md5, sizeof(md5_context));
-	memcpy(&sha1, &ssl->fin_sha1, sizeof(sha1_context));
+	memcpy(&md5_ctx, &ssl->fin_md5, sizeof(md5_context));
+	memcpy(&sha1_ctx, &ssl->fin_sha1, sizeof(sha1_context));
 
 	if (ssl->minor_ver == SSL_MINOR_VERSION_0) {
 		memset(pad_1, 0x36, 48);
 		memset(pad_2, 0x5C, 48);
 
-		md5_update(&md5, ssl->session->master, 48);
-		md5_update(&md5, pad_1, 48);
-		md5_finish(&md5, hash);
+		md5_update(&md5_ctx, ssl->session->master, 48);
+		md5_update(&md5_ctx, pad_1, 48);
+		md5_finish(&md5_ctx, hash);
 
-		md5_starts(&md5);
-		md5_update(&md5, ssl->session->master, 48);
-		md5_update(&md5, pad_2, 48);
-		md5_update(&md5, hash, 16);
-		md5_finish(&md5, hash);
+		md5_starts(&md5_ctx);
+		md5_update(&md5_ctx, ssl->session->master, 48);
+		md5_update(&md5_ctx, pad_2, 48);
+		md5_update(&md5_ctx, hash, 16);
+		md5_finish(&md5_ctx, hash);
 
-		sha1_update(&sha1, ssl->session->master, 48);
-		sha1_update(&sha1, pad_1, 40);
-		sha1_finish(&sha1, hash + 16);
+		sha1_update(&sha1_ctx, ssl->session->master, 48);
+		sha1_update(&sha1_ctx, pad_1, 40);
+		sha1_finish(&sha1_ctx, hash + 16);
 
-		sha1_starts(&sha1);
-		sha1_update(&sha1, ssl->session->master, 48);
-		sha1_update(&sha1, pad_2, 40);
-		sha1_update(&sha1, hash + 16, 20);
-		sha1_finish(&sha1, hash + 16);
+		sha1_starts(&sha1_ctx);
+		sha1_update(&sha1_ctx, ssl->session->master, 48);
+		sha1_update(&sha1_ctx, pad_2, 40);
+		sha1_update(&sha1_ctx, hash + 16, 20);
+		sha1_finish(&sha1_ctx, hash + 16);
 	} else {		/* TLSv1 */
-		md5_finish(&md5, hash);
-		sha1_finish(&sha1, hash + 16);
+		md5_finish(&md5_ctx, hash);
+		sha1_finish(&sha1_ctx, hash + 16);
 	}
 
 	SSL_DEBUG_BUF(3, "calculated verify result", hash, 36);
@@ -432,7 +432,7 @@ static void ssl_mac_md5(unsigned char *secret,
 {
 	unsigned char header[11];
 	unsigned char padding[48];
-	md5_context md5;
+	md5_context md5_ctx;
 
 	memcpy(header, ctr, 8);
 	header[8] = (unsigned char)type;
@@ -440,19 +440,19 @@ static void ssl_mac_md5(unsigned char *secret,
 	header[10] = (unsigned char)(len);
 
 	memset(padding, 0x36, 48);
-	md5_starts(&md5);
-	md5_update(&md5, secret, 16);
-	md5_update(&md5, padding, 48);
-	md5_update(&md5, header, 11);
-	md5_update(&md5, buf, len);
-	md5_finish(&md5, buf + len);
+	md5_starts(&md5_ctx);
+	md5_update(&md5_ctx, secret, 16);
+	md5_update(&md5_ctx, padding, 48);
+	md5_update(&md5_ctx, header, 11);
+	md5_update(&md5_ctx, buf, len);
+	md5_finish(&md5_ctx, buf + len);
 
 	memset(padding, 0x5C, 48);
-	md5_starts(&md5);
-	md5_update(&md5, secret, 16);
-	md5_update(&md5, padding, 48);
-	md5_update(&md5, buf + len, 16);
-	md5_finish(&md5, buf + len);
+	md5_starts(&md5_ctx);
+	md5_update(&md5_ctx, secret, 16);
+	md5_update(&md5_ctx, padding, 48);
+	md5_update(&md5_ctx, buf + len, 16);
+	md5_finish(&md5_ctx, buf + len);
 }
 
 static void ssl_mac_sha1(unsigned char *secret,
@@ -461,7 +461,7 @@ static void ssl_mac_sha1(unsigned char *secret,
 {
 	unsigned char header[11];
 	unsigned char padding[40];
-	sha1_context sha1;
+	sha1_context sha1_ctx;
 
 	memcpy(header, ctr, 8);
 	header[8] = (unsigned char)type;
@@ -469,19 +469,19 @@ static void ssl_mac_sha1(unsigned char *secret,
 	header[10] = (unsigned char)(len);
 
 	memset(padding, 0x36, 40);
-	sha1_starts(&sha1);
-	sha1_update(&sha1, secret, 20);
-	sha1_update(&sha1, padding, 40);
-	sha1_update(&sha1, header, 11);
-	sha1_update(&sha1, buf, len);
-	sha1_finish(&sha1, buf + len);
+	sha1_starts(&sha1_ctx);
+	sha1_update(&sha1_ctx, secret, 20);
+	sha1_update(&sha1_ctx, padding, 40);
+	sha1_update(&sha1_ctx, header, 11);
+	sha1_update(&sha1_ctx, buf, len);
+	sha1_finish(&sha1_ctx, buf + len);
 
 	memset(padding, 0x5C, 40);
-	sha1_starts(&sha1);
-	sha1_update(&sha1, secret, 20);
-	sha1_update(&sha1, padding, 40);
-	sha1_update(&sha1, buf + len, 20);
-	sha1_finish(&sha1, buf + len);
+	sha1_starts(&sha1_ctx);
+	sha1_update(&sha1_ctx, secret, 20);
+	sha1_update(&sha1_ctx, padding, 40);
+	sha1_update(&sha1_ctx, buf + len, 20);
+	sha1_finish(&sha1_ctx, buf + len);
 }
 
 /*
@@ -1348,7 +1348,7 @@ int ssl_parse_change_cipher_spec(ssl_context * ssl)
 }
 
 static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
-			      md5_context * md5, sha1_context * sha1)
+			      md5_context * md5_ctx, sha1_context * sha1_ctx)
 {
 	int len = 12;
 	const char *sender;
@@ -1372,10 +1372,10 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 	 */
 
 	SSL_DEBUG_BUF(4, "finished  md5 state", (unsigned char *)
-		      md5->state, sizeof(md5->state));
+		      md5_ctx->state, sizeof(md5_ctx->state));
 
 	SSL_DEBUG_BUF(4, "finished sha1 state", (unsigned char *)
-		      sha1->state, sizeof(sha1->state));
+		      sha1_ctx->state, sizeof(sha1_ctx->state));
 
 	if (ssl->minor_ver == SSL_MINOR_VERSION_0) {
 		sender = (from == SSL_IS_CLIENT) ? "CLNT"
@@ -1383,37 +1383,37 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 
 		memset(padbuf, 0x36, 48);
 
-		md5_update(md5, (const unsigned char *)sender, 4);
-		md5_update(md5, ssl->session->master, 48);
-		md5_update(md5, padbuf, 48);
-		md5_finish(md5, md5sum);
+		md5_update(md5_ctx, (const unsigned char *)sender, 4);
+		md5_update(md5_ctx, ssl->session->master, 48);
+		md5_update(md5_ctx, padbuf, 48);
+		md5_finish(md5_ctx, md5sum);
 
-		sha1_update(sha1, (const unsigned char *)sender, 4);
-		sha1_update(sha1, ssl->session->master, 48);
-		sha1_update(sha1, padbuf, 40);
-		sha1_finish(sha1, sha1sum);
+		sha1_update(sha1_ctx, (const unsigned char *)sender, 4);
+		sha1_update(sha1_ctx, ssl->session->master, 48);
+		sha1_update(sha1_ctx, padbuf, 40);
+		sha1_finish(sha1_ctx, sha1sum);
 
 		memset(padbuf, 0x5C, 48);
 
-		md5_starts(md5);
-		md5_update(md5, ssl->session->master, 48);
-		md5_update(md5, padbuf, 48);
-		md5_update(md5, md5sum, 16);
-		md5_finish(md5, buf);
+		md5_starts(md5_ctx);
+		md5_update(md5_ctx, ssl->session->master, 48);
+		md5_update(md5_ctx, padbuf, 48);
+		md5_update(md5_ctx, md5sum, 16);
+		md5_finish(md5_ctx, buf);
 
-		sha1_starts(sha1);
-		sha1_update(sha1, ssl->session->master, 48);
-		sha1_update(sha1, padbuf, 40);
-		sha1_update(sha1, sha1sum, 20);
-		sha1_finish(sha1, buf + 16);
+		sha1_starts(sha1_ctx);
+		sha1_update(sha1_ctx, ssl->session->master, 48);
+		sha1_update(sha1_ctx, padbuf, 40);
+		sha1_update(sha1_ctx, sha1sum, 20);
+		sha1_finish(sha1_ctx, buf + 16);
 
 		len += 24;
 	} else {
 		sender = (from == SSL_IS_CLIENT)
 		    ? "client finished" : "server finished";
 
-		md5_finish(md5, padbuf);
-		sha1_finish(sha1, padbuf + 16);
+		md5_finish(md5_ctx, padbuf);
+		sha1_finish(sha1_ctx, padbuf + 16);
 
 		tls1_prf(ssl->session->master, 48, sender,
 			 padbuf, 36, buf, len);
@@ -1421,8 +1421,8 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 
 	SSL_DEBUG_BUF(3, "calc finished result", buf, len);
 
-	memset(md5, 0, sizeof(md5_context));
-	memset(sha1, 0, sizeof(sha1_context));
+	memset(md5_ctx, 0, sizeof(md5_context));
+	memset(sha1_ctx, 0, sizeof(sha1_context));
 
 	memset(padbuf, 0, sizeof(padbuf));
 	memset(md5sum, 0, sizeof(md5sum));
@@ -1434,15 +1434,15 @@ static void ssl_calc_finished(ssl_context * ssl, unsigned char *buf, int from,
 int ssl_write_finished(ssl_context * ssl)
 {
 	int ret, hash_len;
-	md5_context md5;
-	sha1_context sha1;
+	md5_context md5_ctx;
+	sha1_context sha1_ctx;
 
 	SSL_DEBUG_MSG(2, ("=> write finished"));
 
-	memcpy(&md5, &ssl->fin_md5, sizeof(md5_context));
-	memcpy(&sha1, &ssl->fin_sha1, sizeof(sha1_context));
+	memcpy(&md5_ctx, &ssl->fin_md5, sizeof(md5_context));
+	memcpy(&sha1_ctx, &ssl->fin_sha1, sizeof(sha1_context));
 
-	ssl_calc_finished(ssl, ssl->out_msg + 4, ssl->endpoint, &md5, &sha1);
+	ssl_calc_finished(ssl, ssl->out_msg + 4, ssl->endpoint, &md5_ctx, &sha1_ctx);
 
 	hash_len = (ssl->minor_ver == SSL_MINOR_VERSION_0) ? 36 : 12;
 
@@ -1477,14 +1477,14 @@ int ssl_write_finished(ssl_context * ssl)
 int ssl_parse_finished(ssl_context * ssl)
 {
 	int ret, hash_len;
-	md5_context md5;
-	sha1_context sha1;
+	md5_context md5_ctx;
+	sha1_context sha1_ctx;
 	unsigned char buf[36];
 
 	SSL_DEBUG_MSG(2, ("=> parse finished"));
 
-	memcpy(&md5, &ssl->fin_md5, sizeof(md5_context));
-	memcpy(&sha1, &ssl->fin_sha1, sizeof(sha1_context));
+	memcpy(&md5_ctx, &ssl->fin_md5, sizeof(md5_context));
+	memcpy(&sha1_ctx, &ssl->fin_sha1, sizeof(sha1_context));
 
 	ssl->do_crypt = 1;
 
@@ -1505,7 +1505,7 @@ int ssl_parse_finished(ssl_context * ssl)
 		return (TROPICSSL_ERR_SSL_BAD_HS_FINISHED);
 	}
 
-	ssl_calc_finished(ssl, buf, ssl->endpoint ^ 1, &md5, &sha1);
+	ssl_calc_finished(ssl, buf, ssl->endpoint ^ 1, &md5_ctx, &sha1_ctx);
 
 	if (memcmp(ssl->in_msg + 4, buf, hash_len) != 0) {
 		SSL_DEBUG_MSG(1, ("bad finished message"));
