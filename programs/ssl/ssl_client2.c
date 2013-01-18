@@ -68,7 +68,7 @@ static void my_debug(void *ctx, int level, const char *str)
 
 int main(void)
 {
-	int ret, len, server_fd;
+	int ret, len, server_fd = -1;
 	unsigned char buf[1024];
 	havege_state hs;
 	ssl_context ssl;
@@ -81,7 +81,11 @@ int main(void)
 	 * 0. Initialize the RNG and the session data
 	 */
 	havege_init(&hs);
+	memset(&ssl, 0, sizeof(ssl));
 	memset(&ssn, 0, sizeof(ssl_session));
+	memset(&cacert, 0, sizeof(x509_cert));
+	memset(&clicert, 0, sizeof(x509_cert));
+	memset(&rsa, 0, sizeof(rsa_context));
 
 	/*
 	 * 1.1. Load the trusted CA
@@ -89,7 +93,6 @@ int main(void)
 	printf("\n  . Loading the CA root certificate ...");
 	fflush(stdout);
 
-	memset(&cacert, 0, sizeof(x509_cert));
 
 	/*
 	 * Alternatively, you may load the CA certificates from a .pem or
@@ -111,8 +114,6 @@ int main(void)
 	 */
 	printf("  . Loading the client cert. and key...");
 	fflush(stdout);
-
-	memset(&clicert, 0, sizeof(x509_cert));
 
 	ret = x509parse_crt(&clicert, (const unsigned char *)test_cli_crt,
 			    strlen(test_cli_crt));
