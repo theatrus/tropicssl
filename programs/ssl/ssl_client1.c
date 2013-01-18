@@ -66,7 +66,7 @@ static void my_debug(void *ctx, int level, const char *str)
 
 int main(void)
 {
-	int ret, len, server_fd;
+	int ret, len, server_fd = -1;
 	unsigned char buf[1024];
 	havege_state hs;
 	ssl_context ssl;
@@ -76,6 +76,7 @@ int main(void)
 	 * 0. Initialize the RNG and the session data
 	 */
 	havege_init(&hs);
+	memset(&ssl, 0, sizeof(ssl));
 	memset(&ssn, 0, sizeof(ssl_session));
 
 	/*
@@ -162,7 +163,6 @@ int main(void)
 	ssl_close_notify(&ssl);
 
 exit:
-
 	net_close(server_fd);
 	ssl_free(&ssl);
 
