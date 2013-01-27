@@ -238,7 +238,7 @@ static const unsigned char shifts[2][4][4] = {
 	 }
 };
 
-static const char indexes[2][4][20] = {
+static const signed char indexes[2][4][20] = {
 	{
 	 {
 	  0, 1, 2, 3, 8, 9, 10, 11, 38, 39,
@@ -269,7 +269,7 @@ static const char indexes[2][4][20] = {
 	 }
 };
 
-static const char transposes[2][20] = {
+static const signed char transposes[2][20] = {
 	{
 	 21, 22, 23, 20,
 	 -1, -1, -1, -1,
