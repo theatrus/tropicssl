@@ -1238,8 +1238,8 @@ int ssl_parse_certificate(ssl_context * ssl)
 	}
 
 	if ((ssl->peer_cert = (x509_cert *) malloc(sizeof(x509_cert))) == NULL) {
-		SSL_DEBUG_MSG(1, ("malloc(%d bytes) failed",
-				  sizeof(x509_cert)));
+		SSL_DEBUG_MSG(1, ("malloc(%lu bytes) failed",
+				  (unsigned long)sizeof(x509_cert)));
 		return (1);
 	}
 
